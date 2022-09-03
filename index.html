@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>WMTSLayer | Sample | ArcGIS API for JavaScript 4.24</title>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.24/esri/themes/light/main.css"
+    />
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .esri-layer-list {
+        width: 310px;
+      }
+    </style>
+
+    <script src="https://js.arcgis.com/4.24/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/WMTSLayer",
+        "esri/widgets/LayerList"
+      ], (Map, MapView, WMTSLayer, LayerList) => {
+        const layer = new WMTSLayer({
+          url: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts/rest",
+          activeLayer: {
+            id: "public-site-ws-62fd26ed698b8a120dd698cb:deadheading_720"
+          },
+          serviceMode: "RESTful"
+        });
+
+        const map = new Map({
+          layers: [layer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-79.9959, 40.4406],
+          zoom: 13
+        });
+        /*
+        view.when(() => {
+          view.extent = layer.fullExtent;
+          const layerList = new LayerList({
+            view: view
+          });
+          view.ui.add(layerList, "bottom-left");
+        });
+        */
+      });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
