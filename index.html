@@ -33,18 +33,25 @@
         "esri/Map",
         "esri/views/MapView",
         "esri/layers/WMTSLayer",
+        "esri/layers/TileLayer",
         "esri/widgets/LayerList"
-      ], (Map, MapView, WMTSLayer, LayerList) => {
+      ], (Map, MapView, WMTSLayer, TileLayer, LayerList) => {
         const layer = new WMTSLayer({
-          url: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts/rest",
+          url: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts",
           activeLayer: {
-            id: "public-site-ws-62fd26ed698b8a120dd698cb:deadheading_720"
+            id: "public-site-ws-62fd26ed698b8a120dd698cb"
           },
-          serviceMode: "RESTful"
+          version: "1.1.0"
         });
 
+        const imageTileLayer = new TileLayer({
+          portalItem: {
+            id: "10df2279f9684e4a9f6a7f08febac2a9" // World Hillshade
+          }
+        });
+        
         const map = new Map({
-          layers: [layer]
+          layers: [imageTileLayer, layer]
         });
 
         const view = new MapView({
@@ -53,15 +60,9 @@
           center: [-79.9959, 40.4406],
           zoom: 13
         });
-        /*
-        view.when(() => {
+        layer.when(function(){
           view.extent = layer.fullExtent;
-          const layerList = new LayerList({
-            view: view
-          });
-          view.ui.add(layerList, "bottom-left");
         });
-        */
       });
     </script>
   </head>
