@@ -1,7 +1,12 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { environment } from '../environments/environment';
-import * as L from 'leaflet';
+
+
+import Map from "@arcgis/core/Map";
+import MapView from "@arcgis/core/views/MapView";
+import WMTSLayer from "@arcgis/core/layers/WMTSLayer";
+import TileLayer from "@arcgis/core/layers/TileLayer";
 
 @Component({
   selector: 'app-root',
@@ -16,48 +21,34 @@ export class AppComponent implements AfterViewInit {
     this.loadMap();
   }
 
-  private getCurrentPosition(): any {
-    return new Observable((observer: Subscriber<any>) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position: any) => {
-          observer.next({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          observer.complete();
-        });
-      } else {
-        observer.error();
+  private loadMap(): void {
+    const layer = new WMTSLayer({
+      url: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts",
+      activeLayer: {
+        id: "public-site-ws-62fd26ed698b8a120dd698cb"
+      },
+      version: "1.1.0"
+    });
+
+    const imageTileLayer = new TileLayer({
+      portalItem: {
+        id: "10df2279f9684e4a9f6a7f08febac2a9" // World Hillshade
       }
     });
-  }
+    
+    this.map = new Map({
+      layers: [imageTileLayer, layer]
+    });
 
-  private loadMap(): void {
-    this.map = L.map('map').setView([0, 0], 1);
-    var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
-    layers: 'TOPO-OSM-WMS'
-    }).addTo(this.map);
-    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      maxZoom: 18,
-      id: 'mapbox/streets-v11',
-      tileSize: 512,
-      zoomOffset: -1,
-      accessToken: environment.mapbox.accessToken,
-    }).addTo(this.map);
-
-    this.getCurrentPosition()
-    .subscribe((position: any) => {
-      this.map.flyTo([position.latitude, position.longitude], 13);
-
-      const icon = L.icon({
-        iconUrl: 'https://res.cloudinary.com/rodrigokamada/image/upload/v1637581626/Blog/angular-leaflet/marker-icon.png',
-        shadowUrl: 'https://res.cloudinary.com/rodrigokamada/image/upload/v1637581626/Blog/angular-leaflet/marker-shadow.png',
-        popupAnchor: [13, 0],
-      });
-
-      const marker = L.marker([position.latitude, position.longitude], { icon }).bindPopup('Angular Leaflet');
-      marker.addTo(this.map);
+    const view = new MapView({
+      container: "viewDiv",
+      map: this.map,
+      center: [-79.9959, 40.4406],
+      zoom: 13
+    });
+    
+    layer.when(function(){
+      view.extent = layer.fullExtent;
     });
   }
 }
