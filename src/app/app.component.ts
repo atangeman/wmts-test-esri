@@ -16,13 +16,15 @@ import TileLayer from "@arcgis/core/layers/TileLayer";
 export class AppComponent implements AfterViewInit {
 
   map: any;
+  layer: any;
 
   public ngAfterViewInit(): void {
     this.loadMap();
   }
 
   private loadMap(): void {
-    const layer = new WMTSLayer({
+   
+    this.layer = new WMTSLayer({
       url: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts",
       activeLayer: {
         id: "public-site-ws-62fd26ed698b8a120dd698cb"
@@ -36,19 +38,20 @@ export class AppComponent implements AfterViewInit {
       }
     });
     
-    this.map = new Map({
-      layers: [imageTileLayer, layer]
+    var map = new Map({
+      layers: [imageTileLayer, this.layer],
+      //basemap: "arcgis-topographic" // Basemap layer service
     });
 
     const view = new MapView({
       container: "viewDiv",
-      map: this.map,
+      map: map,
       center: [-79.9959, 40.4406],
-      zoom: 13
+      zoom: 5
     });
-    
-    layer.when(function(){
-      view.extent = layer.fullExtent;
+
+    this.layer.when(function(this: any){
+      view.extent = this.layer.fullExtent;
     });
   }
 }
