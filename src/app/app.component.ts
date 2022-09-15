@@ -6,7 +6,7 @@ import { environment } from '../environments/environment';
 import Map from "@arcgis/core/Map";
 import MapView from "@arcgis/core/views/MapView";
 import WMTSLayer from "@arcgis/core/layers/WMTSLayer";
-import TileLayer from "@arcgis/core/layers/TileLayer";
+import OpenStreetMapLayer from "@arcgis/core/layers/OpenStreetMapLayer";
 
 @Component({
   selector: 'app-root',
@@ -32,14 +32,10 @@ export class AppComponent implements AfterViewInit {
       version: "1.1.0"
     });
 
-    const imageTileLayer = new TileLayer({
-      portalItem: {
-        id: "10df2279f9684e4a9f6a7f08febac2a9" // World Hillshade
-      }
-    });
-    
+    const osmLayer = new OpenStreetMapLayer();
+
     var map = new Map({
-      layers: [imageTileLayer, this.layer],
+      layers: [osmLayer, this.layer],
       //basemap: "arcgis-topographic" // Basemap layer service
     });
 
