@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, Input } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { environment } from '../environments/environment';
 
@@ -15,29 +15,29 @@ import OpenStreetMapLayer from "@arcgis/core/layers/OpenStreetMapLayer";
 })
 
 export class AppComponent implements AfterViewInit {
+  @Input() baseLayerId: string = "public-site-ws-61d5053998d0c15769f3a995";
   SERVER_URL: string = environment.wmts_server;
   map: any;
-  baseLayer: any;
-  boundaryLayer: any;
+  
 
   public ngAfterViewInit(): void {
-    this.loadMap("public-site-ws-62fd26ed698b8a120dd698cb");
+    this.loadMap();
   }
 
-  private loadMap(baseLayerId: string): void {
+  private loadMap(): void {
    
-    this.baseLayer = new WMTSLayer({
+    var baseLayer = new WMTSLayer({
       url: this.SERVER_URL,
       activeLayer: {
-        id: baseLayerId
+        id: this.baseLayerId
       },
       version: "1.1.0"
     });
 
-    this.boundaryLayer = new WMTSLayer({
+    var boundaryLayer = new WMTSLayer({
       url: this.SERVER_URL,
       activeLayer: {
-        id: baseLayerId + ":boundary"
+        id: this.baseLayerId + ":boundary"
       },
       version: "1.1.0"
     });
@@ -45,7 +45,7 @@ export class AppComponent implements AfterViewInit {
     const osmLayer = new OpenStreetMapLayer();
 
     var map = new Map({
-      layers: [osmLayer, this.baseLayer, this.boundaryLayer],
+      layers: [osmLayer, baseLayer, boundaryLayer],
     });
 
     const view = new MapView({
@@ -55,8 +55,9 @@ export class AppComponent implements AfterViewInit {
       zoom: 5
     });
 
-    this.baseLayer.when(function(this: any){
-      view.extent = this.baseLayer.fullExtent;
+    boundaryLayer.when(function() {
+      view.extent = boundaryLayer.fullExtent;
+      view.zoom = 10;
     });
   }
 }
