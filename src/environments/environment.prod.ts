@@ -1,6 +1,4 @@
 export const environment = {
-  production: true,
-  mapbox: {
-    accessToken: 'pk.eyJ1IjoiYnJhc2thbSIsImEiOiJja3NqcXBzbWoyZ3ZvMm5ybzA4N2dzaDR6In0.RUAYJFnNgOnn80wXkrV9ZA',
-  }
-};
+    production: true,
+    wmts_server: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts",
+  };

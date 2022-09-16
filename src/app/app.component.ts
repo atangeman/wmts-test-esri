@@ -13,21 +13,31 @@ import OpenStreetMapLayer from "@arcgis/core/layers/OpenStreetMapLayer";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
 
+export class AppComponent implements AfterViewInit {
+  SERVER_URL: string = environment.wmts_server;
   map: any;
-  layer: any;
+  baseLayer: any;
+  boundaryLayer: any;
 
   public ngAfterViewInit(): void {
-    this.loadMap();
+    this.loadMap("public-site-ws-62fd26ed698b8a120dd698cb");
   }
 
-  private loadMap(): void {
+  private loadMap(baseLayerId: string): void {
    
-    this.layer = new WMTSLayer({
-      url: "http://gs-dev.connectanywhere.co:8080/geoserver/gwc/service/wmts",
+    this.baseLayer = new WMTSLayer({
+      url: this.SERVER_URL,
       activeLayer: {
-        id: "public-site-ws-62fd26ed698b8a120dd698cb"
+        id: baseLayerId
+      },
+      version: "1.1.0"
+    });
+
+    this.boundaryLayer = new WMTSLayer({
+      url: this.SERVER_URL,
+      activeLayer: {
+        id: baseLayerId + ":boundary"
       },
       version: "1.1.0"
     });
@@ -35,8 +45,7 @@ export class AppComponent implements AfterViewInit {
     const osmLayer = new OpenStreetMapLayer();
 
     var map = new Map({
-      layers: [osmLayer, this.layer],
-      //basemap: "arcgis-topographic" // Basemap layer service
+      layers: [osmLayer, this.baseLayer, this.boundaryLayer],
     });
 
     const view = new MapView({
@@ -46,8 +55,8 @@ export class AppComponent implements AfterViewInit {
       zoom: 5
     });
 
-    this.layer.when(function(this: any){
-      view.extent = this.layer.fullExtent;
+    this.baseLayer.when(function(this: any){
+      view.extent = this.baseLayer.fullExtent;
     });
   }
 }
